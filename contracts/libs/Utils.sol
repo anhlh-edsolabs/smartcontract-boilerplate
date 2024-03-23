@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
+
+library RoleUtils {
+    function _calculateRoleHash(
+        string memory roleName
+    ) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked(address(this), roleName));
+    }
+}
+
+library CommonValidation {
+    function _noZeroAddress(address account) internal pure {
+        require(account != address(0), "Setting to the zero address");
+    }
+
+    function _noZeroAddress(
+        address account,
+        string memory message
+    ) internal pure {
+        message = bytes(message).length > 0
+            ? message
+            : "Setting to the zero address";
+        require(account != address(0), message);
+    }
+}
+
+library StringUtils {
+    function _bytes32toString(
+        bytes32 value
+    ) internal pure returns (string memory result) {
+        uint8 length = 0;
+
+        while (length < 32 && value[length] != 0) {
+            length++;
+        }
+
+        assembly {
+            result := mload(0x40)
+            // new "memory end" including padding (the string isn't larger than 32 bytes)
+            mstore(0x40, add(result, 0x40))
+            // store length in memory
+            mstore(result, length)
+            // write actual data
+            mstore(add(result, 0x20), value)
+        }
+    }
+
+    // https://ethereum.stackexchange.com/a/126928
+    function _bytesToHexstring(bytes memory input) internal pure returns (string memory) {
+
+        // Fixed `input` size for hexadecimal convertion
+        bytes memory converted = new bytes(input.length * 2);
+
+        bytes memory _base = "0123456789abcdef";
+
+        for (uint256 i = 0; i < input.length; i++) {
+            converted[i * 2] = _base[uint8(input[i]) / _base.length];
+            converted[i * 2 + 1] = _base[uint8(input[i]) % _base.length];
+        }
+
+        return string(abi.encodePacked("0x", converted));
+    }
+}
+
+library BoolUtils {
+    /**
+     * @dev Converts a boolean value to bytes32.
+     * @param value The boolean value to be converted.
+     * @return result The bytes32 representation of the boolean value.
+     */
+    function _toBytes32(bool value) internal pure returns (bytes32 result) {
+        // Sets the value of `result` to `value` using assembly
+        assembly {
+            result := value
+        }
+    }
+
+    /**
+     * @dev Converts a bytes32 value to a boolean value by performing a bitwise AND operation between the input bytes32 `value` and 1.
+     * If the least significant bit of the bytes32 value is 1, the result of the AND operation will be 1 -> true.
+     * If the least significant bit is 0, the result of the AND operation will be 0 -> false.
+     * 
+     * @param value The bytes32 value to be converted.
+     * @return The boolean value converted from the bytes32 value.
+     */
+    function _bytes32ToBool(bytes32 value) internal pure returns (bool) {
+        return (value & bytes32(uint256(1))) != 0;
+    }
+}
