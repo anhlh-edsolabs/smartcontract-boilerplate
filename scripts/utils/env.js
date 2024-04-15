@@ -1,10 +1,11 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
+const fs = require("fs");
 const path = require("path");
 
 const ENV_KEY = process.env.DEPLOYMENT_ENV;
 
-const RPC_URL = process.env["MUMBAI_PROVIDER_" + ENV_KEY];
+const RPC_URL = process.env["RPC_PROVIDER_" + ENV_KEY];
 const DEPLOYER_ADDR = process.env["DEPLOYER_" + ENV_KEY];
 const DEPLOYER_PK = process.env["DEPLOYER_PK_" + ENV_KEY];
 
@@ -22,7 +23,10 @@ const DEPLOYMENT_DATA_FILENAME = ".deployment_data.json";
 const DeploymentPath = path.join(DEPLOYMENT_DATA_DIR, DEPLOYMENT_DATA_FILENAME);
 const DeploymentFile = path.resolve(DeploymentPath);
 
-const DeploymentData = require(DeploymentFile);
+let DeploymentData;
+if (fs.existsSync(DeploymentPath) && fs.existsSync(DeploymentFile))
+    DeploymentData = require(DeploymentFile);
+else DeploymentData = {};
 
 const CoinBase = async () => {
     const chainID = parseInt((await Provider.getNetwork()).chainId);
@@ -49,10 +53,12 @@ const CoinBase = async () => {
 };
 
 module.exports = {
-    ENV_KEY,
-    RPC_URL,
-    DEPLOYER_PK,
-    DEPLOYER_ADDR,
+    Constants: {
+        ENV_KEY,
+        RPC_URL,
+        DEPLOYER_PK,
+        DEPLOYER_ADDR,
+    },
     CoinBase,
     Provider,
     Deployer,

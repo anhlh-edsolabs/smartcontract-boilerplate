@@ -1,24 +1,25 @@
 const {
-    ENV_KEY,
-    RPC_URL,
-    DEPLOYER_PK,
-    DEPLOYER_ADDR,
+    Constants,
     Provider,
     Deployer,
     DeploymentStorage,
     CoinBase,
 } = require("./env");
 
+const { Utils } = require("./utils");
+
+const { Contracts, ABIs } = require("./artifacts");
+
 const { log } = require("console");
 
 module.exports = {
     log,
-    ENV_KEY,
-    RPC_URL,
-    DEPLOYER_PK,
-    DEPLOYER_ADDR,
+    Constants,
     Provider,
     Deployer,
     DeploymentStorage,
-    CoinBase
+    CoinBase,
+    Contracts,
+    ABIs,
+    Utils,
 };
