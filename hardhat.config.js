@@ -12,9 +12,7 @@ require("hardhat-extended-tasks");
 
 const { dot } = require("node:test/reporters");
 const {
-    RPC_URL,
-    DEPLOYER,
-    DEPLOYER_PK,
+    Constants,
     CoinBase,
     log,
 } = require("./scripts/utils");
@@ -47,34 +45,33 @@ module.exports = {
             url: process.env.RPC_PROVIDER_DEV,
             chainId: 11155111,
             // gasPrice: GAS_PRICE * GAS_UNIT * 2,
-            accounts: [DEPLOYER_PK],
-            from: DEPLOYER,
+            accounts: [Constants.DEPLOYER_PK],
+            from: Constants.DEPLOYER_ADDR,
         },
-        mumbai: {
-            url: process.env.MUMBAI_PROVIDER_DEV,
-            chainId: 80001,
-            accounts: [DEPLOYER_PK],
-            from: DEPLOYER,
-            gasPrice: 1e9,
-            minGasPrice: 1e9,
-            initialBaseFeePerGas: 1e9,
+        polygonAmoy: {
+            url: process.env.OKLINK_PROVIDER_DEV,
+            chainId: 80002,
+            accounts: [Constants.DEPLOYER_PK],
+            from: Constants.DEPLOYER_ADDR,
         },
-        // mainnet: {
-        //     url: process.env.MAINNET_PROVIDER,
-        //     chainId: 1,
-        //     accounts: [process.env.MAINNET_DEPLOYER_PK],
-        //     from: process.env.MAINNET_DEPLOYER_ADDRESS,
-        //     gasPrice: 27e9,
-        //     minGasPrice: 25e9,
-        //     initialBaseFeePerGas: 24e9,
-        // },
     },
     etherscan: {
         apiKey: {
             mainnet: process.env.ETHERSCAN_API_KEY,
             sepolia: process.env.ETHERSCAN_API_KEY,
-            polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+            polygon: process.env.POLYGONSCAN_API_KEY,
+            polygonAmoy: process.env.OKLINK_API_KEY,
         },
+        customChains: [
+            {
+                network: "polygonAmoy",
+                chainId: 80002,
+                urls: {
+                    apiURL: "https://www.oklink.com/api/v5/explorer/contract/verify-source-code",
+                    browserURL: "https://www.oklink.com/polygonAmoy",
+                },
+            },
+        ],
     },
     solidity: {
         version: "0.8.20",
@@ -99,5 +96,8 @@ module.exports = {
         disambiguatePaths: true,
         runOnCompile: false,
         strict: true,
+    },
+    sourcify: {
+        enabled: false,
     },
 };
