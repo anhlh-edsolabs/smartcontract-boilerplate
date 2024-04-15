@@ -4,30 +4,14 @@ const chalk = require("chalk");
 const { ethers } = require("ethers");
 const { log } = require("console");
 const {
-    ENV_KEY,
+    Constants: { ENV_KEY },
     CoinBase,
     Provider,
     DeploymentStorage,
 } = require("../../scripts/utils/env");
+const { Utils } = require("../../scripts/utils/utils");
 
 const UpgradeableBeaconABI = require("./UpgradeableBeacon_ABI.json");
-
-/** Implementation Slot is calculated as follow:
- * IMPLEMENTATION_SLOT = BigNumber.from(utils.keccak256(Buffer.from('eip1967.proxy.implementation'))).sub(1).toHexString()
- *
- * Output value: '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
- * */
-const IMPLEMENTATION_SLOT =
-    "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
-
-/** The storage slot of the UpgradeableBeacon contract which defines the implementation for this proxy.
- * This is the keccak-256 hash of "eip1967.proxy.beacon" subtracted by 1.
- * BEACON_SLOT = BigNumber.from(utils.keccak256(Buffer.from('eip1967.proxy.beacon'))).sub(1).toHexString()
- *
- * Output value: '0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'
- * */
-const BEACON_SLOT =
-    "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50";
 
 const chainID = hre.network.config.chainId;
 
@@ -138,7 +122,7 @@ async function writeDeploymentResult(
 }
 
 async function getImplementationAddress(proxyAddress) {
-    const impl = await Provider.getStorage(proxyAddress, IMPLEMENTATION_SLOT);
+    const impl = await Provider.getStorage(proxyAddress, Utils.erc1967Slot.Implementation());
     return ethers.AbiCoder.defaultAbiCoder().decode(["address"], impl)[0];
 }
 

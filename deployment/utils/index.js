@@ -3,11 +3,7 @@ const { upgrade } = require("./upgrade");
 const { Libs } = require("./libs");
 const {
     log,
-    ENV_KEY,
-    RPC_URL,
-    DEPLOYER_PK,
-    DEPLOYER_ADDR,
-    SETTLEMENT_TARGET,
+    Constants,
     Provider,
     Deployer,
     DeploymentStorage,
@@ -17,11 +13,7 @@ const {
 module.exports = {
     DeployHelper: { deploy, deployBeacon, upgrade },
     log,
-    ENV_KEY,
-    RPC_URL,
-    DEPLOYER_PK,
-    DEPLOYER_ADDR,
-    SETTLEMENT_TARGET,
+    Constants,
     Provider,
     Deployer,
     DeploymentStorage,
