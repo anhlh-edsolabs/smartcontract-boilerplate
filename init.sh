@@ -9,6 +9,9 @@ git submodule update --init --recursive
 # install FoundryUp
 curl -L https://foundry.paradigm.xyz | bash
 
+# reload .bashrc
+source ~/.zshenv
+
 # install foundry
 foundryup
 
@@ -16,4 +19,8 @@ foundryup
 forge install --no-commit foundry-rs/forge-std
 
 # copy the .env file
-# cp .env.example .env
+if [ -f ".env" ]; then
+    echo ".env file already exists, skipping copy."
+else
+    cp .env.sample .env
+fi
