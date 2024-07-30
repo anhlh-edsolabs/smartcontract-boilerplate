@@ -16,6 +16,8 @@ const { BlockHelper } = require("./blockHelper");
 
 const { log } = require("console");
 
+require("./provider");
+
 module.exports = {
     log,
     Constants,
