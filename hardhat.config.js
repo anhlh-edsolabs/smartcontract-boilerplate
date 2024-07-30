@@ -41,6 +41,11 @@ module.exports = {
                 count: 100,
             },
         },
+        local: {
+            url: "http://127.0.0.1:8545/",
+            chainId: 31337,
+            accounts: [Constants.DEPLOYER_PK]
+        },
         sepolia: {
             url: process.env.RPC_PROVIDER_DEV,
             chainId: 11155111,
