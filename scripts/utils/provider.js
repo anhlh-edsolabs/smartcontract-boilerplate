@@ -1,7 +1,7 @@
 const ethers = require("ethers");
 const { Utils } = require("./utils");
 
-ethers.JsonRpcProvider.prototype.getNetwork = async function () {
+ethers.JsonRpcProvider.prototype.getNetworkId = async function () {
     return await this.send("eth_chainId");
 }
 
