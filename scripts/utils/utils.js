@@ -85,6 +85,26 @@ function iterateInputs(inputs) {
     return result.join(",");
 }
 
+/**
+ * Retrieves the artifact name and deployment name from a compound contract name.
+ *
+ * @param {string} contractNameCompound - The compound contract name in the format `contractName$deploymentName`.
+ * @returns {Object} - An object containing the artifact name and deployment name.
+ */
+function getContractName(contractNameCompound) {
+    let artifactName = contractNameCompound;
+    let deploymentName = "";
+
+    if (String(contractNameCompound).includes("$")) {
+        const [_artifactName, _deploymentName] =
+            String(contractNameCompound).split("$");
+        artifactName = _artifactName.trim();
+        deploymentName = _deploymentName.trim();
+    }
+
+    return { artifactName, deploymentName };
+}
+
 module.exports = {
     Utils: {
         erc7201,
@@ -94,5 +114,6 @@ module.exports = {
             Admin: erc1967AdminSlot,
         },
         iterateInputs,
+        getContractName,
     },
 };

@@ -3,42 +3,57 @@ const fs = require("fs");
 const chalk = require("chalk");
 const { log } = require("console");
 const { Libs } = require("./libs");
-const { ENV_KEY, DeploymentStorage } = require("../../scripts/utils/env");
+const { Utils } = require("../../scripts/utils/utils");
+const {
+    Constants: { ENV_KEY },
+    DeploymentStorage,
+} = require("../../scripts/utils/env");
 
 const proxyOptions = { kind: "uups" };
 
 async function upgrade(
-    CONTRACT_NAME_V1,
-    CONTRACT_NAME_V2 = CONTRACT_NAME_V1,
+    contractNameV1,
+    contractNameV2 = contractNameV1,
     implConstructorArgs = [],
-    implForceDeploy = false
+    implForceDeploy = false,
+    skipStorageCheck = false,
 ) {
     const [deployer] = await hre.ethers.getSigners();
 
-    const PROXY_ADDRESS =
-        DeploymentStorage.Env[ENV_KEY][CONTRACT_NAME_V1].Proxy;
+    const PROXY_ADDRESS = DeploymentStorage.Env[ENV_KEY][contractNameV1].Proxy;
 
     await Libs.printDeploymentTime(deployer, true);
 
-    const implV1 = await Libs.getImplementationAddress(PROXY_ADDRESS);
+    let { artifactName: artifactNameV1, deploymentName: deploymentNameV1 } =
+        Utils.getContractName(contractNameV1);
+    let { artifactName: artifactNameV2, deploymentName: deploymentNameV2 } =
+        Utils.getContractName(contractNameV2);
+
+    const previousImpl = await Libs.getImplementationAddress(PROXY_ADDRESS);
     log(
         `Upgrading ${chalk.bold.blue(
-            CONTRACT_NAME_V1
-        )} at proxy: ${chalk.bold.red(PROXY_ADDRESS)}`
+            deploymentNameV1 != "" ? deploymentNameV1 : artifactNameV1,
+        )} at proxy: ${chalk.bold.red(PROXY_ADDRESS)}`,
     );
-    console.log(`Current implementation address: ${chalk.bold.yellow(implV1)}`);
+    console.log(
+        `Current implementation address: ${chalk.bold.yellow(previousImpl)}`,
+    );
 
     const { factory: factoryV2, feeOverriding } = await Libs.estimateDeploy(
-        CONTRACT_NAME_V2,
-        implConstructorArgs
+        artifactNameV2,
+        implConstructorArgs,
     );
 
     if (implConstructorArgs.length > 0) {
         proxyOptions.constructorArgs = implConstructorArgs;
     }
 
-    if(implForceDeploy) {
+    if (implForceDeploy) {
         proxyOptions.redeployImplementation = "always";
+    }
+
+    if (skipStorageCheck) {
+        proxyOptions.unsafeSkipStorageCheck = skipStorageCheck;
     }
 
     proxyOptions.txOverrides = feeOverriding;
@@ -47,7 +62,7 @@ async function upgrade(
     const deploymentV2 = await hre.upgrades.upgradeProxy(
         PROXY_ADDRESS,
         factoryV2,
-        proxyOptions
+        proxyOptions,
     );
 
     // const contractV2 = await deploymentV2.waitForDeployment();
@@ -55,17 +70,21 @@ async function upgrade(
 
     const implAddress = await Libs.printDeploymentResult(
         deployer,
-        CONTRACT_NAME_V2,
+        deploymentNameV2 != "" ? deploymentNameV2 : artifactNameV2,
         PROXY_ADDRESS,
-        true
+        true,
     );
 
     await Libs.writeDeploymentResult(
-        CONTRACT_NAME_V2,
+        deploymentNameV2 != ""
+            ? `${artifactNameV2}$${deploymentNameV2}`
+            : artifactNameV2,
         implAddress,
         [],
         PROXY_ADDRESS,
-        true
+        null,
+        previousImpl,
+        true,
     );
 
     return deploymentV2;

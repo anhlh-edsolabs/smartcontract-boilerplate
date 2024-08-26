@@ -96,8 +96,23 @@ async function writeDeploymentResult(
             ? DeploymentStorage.Env[ENV_KEY]
             : {};
     if (isProxyUpgrade) {
-        DeploymentStorage.Env[ENV_KEY][contractName].Impl =
+        const previousImplAddresses = DeploymentStorage.Env[ENV_KEY][
+            contractName
+        ]["PreviousImplementations"]
+            ? DeploymentStorage.Env[ENV_KEY][contractName][
+                  "PreviousImplementations"
+              ]
+            : [];
+
+        previousImplAddresses.push(previousImplAddress);
+
+        DeploymentStorage.Env[ENV_KEY][contractName]["Proxy"] = proxyAddress;
+        DeploymentStorage.Env[ENV_KEY][contractName]["Beacon"] = beaconAddress;
+        DeploymentStorage.Env[ENV_KEY][contractName]["Impl"] =
             implementationAddress;
+        DeploymentStorage.Env[ENV_KEY][contractName][
+            "PreviousImplementations"
+        ] = previousImplAddresses;
     } else {
         DeploymentStorage.Env[ENV_KEY][contractName] = {
             ChainID: chainID,
@@ -122,7 +137,10 @@ async function writeDeploymentResult(
 }
 
 async function getImplementationAddress(proxyAddress) {
-    const impl = await Provider.getStorage(proxyAddress, Utils.erc1967Slot.Implementation());
+    const impl = await Provider.getStorage(
+        proxyAddress,
+        Utils.erc1967Slot.Implementation(),
+    );
     return ethers.AbiCoder.defaultAbiCoder().decode(["address"], impl)[0];
 }
 
@@ -145,7 +163,7 @@ async function estimateDeploy(
 
     try {
         feeData = await Provider.getFeeData();
-    } catch(err) {
+    } catch (err) {
         log(chalk.bold.red("Error getting fee data:", err.shortMessage));
 
         // fallback to default fee data

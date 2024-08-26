@@ -10,18 +10,14 @@ require("hardhat-contract-sizer");
 require("hardhat-gas-reporter");
 require("hardhat-extended-tasks");
 
-const { dot } = require("node:test/reporters");
-const {
-    Constants,
-    CoinBase,
-    log,
-} = require("./scripts/utils");
+const { Constants, CoinBase, log } = require("./scripts/utils");
+const { OZResolver } = require("hardhat-gas-reporter/dist/lib/resolvers/oz");
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     const accounts = await hre.ethers.getSigners();
 
     for (const account of accounts) {
-        console.log(account.address);
+        log(account.address);
     }
 });
 
@@ -44,7 +40,7 @@ module.exports = {
         local: {
             url: "http://127.0.0.1:8545/",
             chainId: 31337,
-            accounts: [Constants.DEPLOYER_PK]
+            accounts: [Constants.DEPLOYER_PK],
         },
         sepolia: {
             url: process.env.RPC_PROVIDER_DEV,
@@ -56,6 +52,12 @@ module.exports = {
         polygonAmoy: {
             url: process.env.OKLINK_PROVIDER_DEV,
             chainId: 80002,
+            accounts: [Constants.DEPLOYER_PK],
+            from: Constants.DEPLOYER_ADDR,
+        },
+        mainnet: {
+            url: process.env.RPC_PROVIDER_PROD,
+            chainId: 1,
             accounts: [Constants.DEPLOYER_PK],
             from: Constants.DEPLOYER_ADDR,
         },
@@ -87,12 +89,12 @@ module.exports = {
             },
         },
     },
-    // paths: {
-    //     sources: "./contracts",
-    //     tests: "./test",
-    //     cache: "./cache",
-    //     artifacts: "./artifacts",
-    // },
+    paths: {
+        sources: "./contracts",
+        tests: "./test",
+        cache: "./cache",
+        artifacts: "./artifacts",
+    },
     mocha: {
         timeout: 600000,
     },
@@ -101,6 +103,24 @@ module.exports = {
         disambiguatePaths: true,
         runOnCompile: false,
         strict: true,
+    },
+    gasReporter: {
+        currency: "USD",
+        coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+        enabled: process.env.REPORT_GAS ? true : false,
+        L1: "ethereum",
+        L1Etherscan: `&apiKey=${process.env.ETHERSCAN_API_KEY}`,
+        gasPrice: 3,
+        currencyDisplayPrecision: 5,
+        includeIntrinsicGas: true,
+        proxyResolver: new OZResolver(),
+        showTimeSpent: true,
+        showMethodSig: true,
+        token: "ETH",
+        reportFormat: "markdown",
+        outputFile: "./gasReport/ethereum.md",
+        forceTerminalOutput: true,
+        forceTerminalOutputFormat: "terminal",
     },
     sourcify: {
         enabled: false,

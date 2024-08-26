@@ -1,6 +1,7 @@
 const hre = require("hardhat");
 const { Libs } = require("./libs");
 const { log } = require("console");
+const { Utils } = require("../../scripts/utils/utils");
 
 const proxyOptions = { kind: "uups" };
 
@@ -15,8 +16,10 @@ async function deploy(
 
     await Libs.printDeploymentTime(deployer);
 
+    let { artifactName, deploymentName } = Utils.getContractName(contractName);
+
     const { factory, feeOverriding } = await Libs.estimateDeploy(
-        contractName,
+        artifactName,
         implConstructorArgs
     );
 
@@ -50,13 +53,13 @@ async function deploy(
 
     const implAddress = await Libs.printDeploymentResult(
         deployer,
-        contractName,
+        deploymentName != "" ? deploymentName : artifactName,
         contractAddress,
         isUpgradeable
     );
 
     await Libs.writeDeploymentResult(
-        contractName,
+        deploymentName != "" ? `${artifactName}$${deploymentName}` : artifactName,
         implAddress,
         initializationArgs,
         isUpgradeable ? contractAddress : null
@@ -74,11 +77,13 @@ async function deployBeacon(
 
     await Libs.printDeploymentTime(deployer);
 
+    let { artifactName, deploymentName } = Utils.getContractName(contractName);
+
     // const { factory, feeOverriding } = await Libs.estimateDeploy(
     //     contractName,
     //     implConstructorArgs
     // );
-    const factory = await hre.ethers.getContractFactory(contractName);
+    const factory = await hre.ethers.getContractFactory(artifactName);
 
     const beaconOptions = {
         kind: "beacon",
@@ -106,14 +111,14 @@ async function deployBeacon(
 
     const implAddress = await Libs.printDeploymentResult(
         deployer,
-        contractName,
+        deploymentName != "" ? deploymentName : artifactName,
         beaconAddress,
         true,
         true
     );
 
     await Libs.writeDeploymentResult(
-        contractName,
+        deploymentName != "" ? `${artifactName}$${deploymentName}` : artifactName,
         implAddress,
         implConstructorArgs,
         null,
