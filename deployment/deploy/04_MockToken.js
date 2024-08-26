@@ -4,11 +4,13 @@ async function main() {
     const CONTRACT_NAME = "MockToken";
     const tokens = [
         {
+            deploymentName: "MockUSDT",
             name: "Test USDT",
             symbol: "TUSDT",
             decimals: 6,
         },
         {
+            deploymentName: "MockUSDC",
             name: "Test USDC",
             symbol: "TUSDC",
             decimals: 6,
@@ -19,7 +21,7 @@ async function main() {
         const IMPL_CONSTRUCTOR_ARGS = [];
 
         await DeployHelper.deploy(
-            CONTRACT_NAME,
+            `${CONTRACT_NAME}$${token.deploymentName}`,
             INITIALIZATION_ARGS,
             true,
             IMPL_CONSTRUCTOR_ARGS,
