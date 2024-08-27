@@ -2,31 +2,38 @@
 pragma solidity ^0.8.9;
 
 library RoleUtils {
-    function _calculateRoleHash(
+    function calculateRoleHash(
         string memory roleName
     ) internal view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this), roleName));
     }
 }
 
-library CommonValidation {
-    function _noZeroAddress(address account) internal pure {
-        require(account != address(0), "Setting to the zero address");
+library Validation {
+    error NoZeroAddress();
+    error NoZeroAddressWithMessage(string message);
+
+    function noZeroAddress(address account) internal pure {
+        if (account == address(0)) {
+            revert NoZeroAddress();
+        }
     }
 
-    function _noZeroAddress(
+    function noZeroAddress(
         address account,
         string memory message
     ) internal pure {
         message = bytes(message).length > 0
             ? message
             : "Setting to the zero address";
-        require(account != address(0), message);
+        if (account == address(0)) {
+            revert NoZeroAddressWithMessage(message);
+        }
     }
 }
 
 library StringUtils {
-    function _bytes32toString(
+    function bytes32toString(
         bytes32 value
     ) internal pure returns (string memory result) {
         uint8 length = 0;
@@ -47,7 +54,7 @@ library StringUtils {
     }
 
     // https://ethereum.stackexchange.com/a/126928
-    function _bytesToHexstring(bytes memory input) internal pure returns (string memory) {
+    function bytesToHexstring(bytes memory input) internal pure returns (string memory) {
 
         // Fixed `input` size for hexadecimal convertion
         bytes memory converted = new bytes(input.length * 2);
@@ -69,7 +76,7 @@ library BoolUtils {
      * @param value The boolean value to be converted.
      * @return result The bytes32 representation of the boolean value.
      */
-    function _toBytes32(bool value) internal pure returns (bytes32 result) {
+    function toBytes32(bool value) internal pure returns (bytes32 result) {
         // Sets the value of `result` to `value` using assembly
         assembly {
             result := value
@@ -84,7 +91,7 @@ library BoolUtils {
      * @param value The bytes32 value to be converted.
      * @return The boolean value converted from the bytes32 value.
      */
-    function _bytes32ToBool(bytes32 value) internal pure returns (bool) {
+    function bytes32ToBool(bytes32 value) internal pure returns (bool) {
         return (value & bytes32(uint256(1))) != 0;
     }
 }

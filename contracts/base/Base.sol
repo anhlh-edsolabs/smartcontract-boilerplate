@@ -5,7 +5,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
-import {RoleUtils, CommonValidation} from "../libs/Utils.sol";
+import {RoleUtils, Validation} from "../libs/Utils.sol";
 
 abstract contract Base is
     Initializable,
@@ -29,10 +29,7 @@ abstract contract Base is
     function __Base_init_unchained(
         address initialAdmin
     ) internal onlyInitializing {
-        CommonValidation._noZeroAddress(
-            initialAdmin,
-            "Base: Initial Admin address must not be the zero address"
-        );
+        Validation.noZeroAddress(initialAdmin);
 
         _grantRole(DEFAULT_ADMIN_ROLE, initialAdmin);
     }
@@ -45,7 +42,7 @@ abstract contract Base is
 
     /** Role definitions */
     function UPGRADER() public view returns (bytes32) {
-        return RoleUtils._calculateRoleHash("UPGRADER");
+        return RoleUtils.calculateRoleHash("UPGRADER");
     }
 
     function _authorizeUpgrade(
