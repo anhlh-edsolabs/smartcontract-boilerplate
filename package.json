@@ -14,11 +14,19 @@
         "testf": "concurrently \"anvil\" \"forge test -vvvvv --gas-report -f http://127.0.0.1:8545\"",
         "testfw": "concurrently \"anvil\" \"forge test -vvvvv --gas-report -w -f http://127.0.0.1:8545\"",
         "dev": "DEPLOYMENT_ENV=DEV yarn hardhat run",
+        "stg": "DEPLOYMENT_ENV=STG yarn hardhat run",
+        "prod": "DEPLOYMENT_ENV=PROD yarn hardhat run",
         "deploy:local": "yarn run dev --network hardhat",
         "deploy:dev:sepolia": "yarn run dev --network sepolia",
-        "deploy:dev:mumbai": "yarn run dev --network mumbai",
+        "deploy:dev:amoy": "yarn run dev --network polygonAmoy",
+        "deploy:stg:sepolia": "yarn run stg --network sepolia",
+        "deploy:stg:amoy": "yarn run stg --network polygonAmoy",
+        "deploy:prod:mainnet": "yarn run prod --network mainnet",
+        "deploy:prod:polygon": "yarn run prod --network polygon",
         "verify:sepolia": "yarn hardhat verify --network sepolia",
-        "verify:mumbai": "yarn hardhat verify --network mumbai"
+        "verify:mainnet": "yarn hardhat verify --network mainnet",
+        "verify:amoy": "yarn hardhat verify --network polygonAmoy",
+        "verify:polygon": "yarn hardhat verify --network polygon"
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",

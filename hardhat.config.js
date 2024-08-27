@@ -26,7 +26,7 @@ task("balance", "Prints an account's balance")
     .setAction(async (taskArgs, hre) => {
         const balance = await ethers.provider.getBalance(taskArgs.account);
 
-        console.log(ethers.utils.formatEther(balance), await CoinBase());
+        log(ethers.utils.formatEther(balance), await CoinBase());
     });
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -89,12 +89,12 @@ module.exports = {
             },
         },
     },
-    // paths: {
-    //     sources: "./contracts",
-    //     tests: "./test",
-    //     cache: "./cache",
-    //     artifacts: "./artifacts",
-    // },
+    paths: {
+        sources: "./contracts",
+        tests: "./test",
+        cache: "./cache",
+        artifacts: "./artifacts",
+    },
     mocha: {
         timeout: 600000,
     },
