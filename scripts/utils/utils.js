@@ -48,7 +48,7 @@ function _erc1967Slot(name) {
  * @returns {string} ERC7201 storage namespace hash as a bytes32 hex string
  */
 function erc7201(namespaceId) {
-    return ethers.toQuantity(
+    return ethers.toBeHex(
         BigInt(
             ethers.keccak256(
                 abiCoder.encode(
