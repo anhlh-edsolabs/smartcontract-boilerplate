@@ -5,14 +5,20 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import {RoleUtils, Validation} from "../libs/Utils.sol";
 
 abstract contract Base is
     Initializable,
     UUPSUpgradeable,
     AccessControlUpgradeable,
-    MulticallUpgradeable
+    MulticallUpgradeable,
+    PausableUpgradeable
 {
+    /** Role definitions */
+    bytes32 public constant UPGRADER = keccak256("UPGRADER");
+    bytes32 public constant PAUSER = keccak256("PAUSER");
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -22,6 +28,7 @@ abstract contract Base is
         __UUPSUpgradeable_init();
         __AccessControl_init();
         __Multicall_init();
+        __Pausable_init();
 
         __Base_init_unchained(initialAdmin);
     }
@@ -32,6 +39,16 @@ abstract contract Base is
         Validation.noZeroAddress(initialAdmin);
 
         _grantRole(DEFAULT_ADMIN_ROLE, initialAdmin);
+        _grantRole(UPGRADER, initialAdmin);
+        _grantRole(PAUSER, initialAdmin);
+    }
+
+    function pause() public onlyRole(PAUSER) {
+        _pause();
+    }
+
+    function unpause() public onlyRole(PAUSER) {
+        _unpause();
     }
 
     function supportsInterface(
@@ -40,12 +57,7 @@ abstract contract Base is
         return super.supportsInterface(interfaceId);
     }
 
-    /** Role definitions */
-    function UPGRADER() public view returns (bytes32) {
-        return RoleUtils.calculateRoleHash("UPGRADER");
-    }
-
     function _authorizeUpgrade(
         address
-    ) internal virtual override onlyRole(UPGRADER()) {}
+    ) internal virtual override onlyRole(UPGRADER) {}
 }
