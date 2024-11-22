@@ -89,6 +89,7 @@ async function writeDeploymentResult(
     initializationArgs = [],
     proxyAddress = null,
     beaconAddress = null,
+    previousImplAddress = null,
     isProxyUpgrade = false,
 ) {
     DeploymentStorage.Env[ENV_KEY] =
@@ -157,7 +158,6 @@ async function estimateDeploy(
     constructorArgs = [],
     constructorArgsFile = "",
 ) {
-    ethers.ContractFactory.getInterface;
     const factory = await hre.ethers.getContractFactory(contractName);
     let feeData;
 
@@ -212,7 +212,7 @@ async function estimateDeploy(
 
     const feeOverriding = {
         maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
-        maxFeePerGas: feeData.maxFeePerGas,
+        maxFeePerGas: feeData.gasPrice * 110n / 100n, // set the MaxFeePerGas to 10% higher than gas price
         baseFeePerGas: feeData.gasPrice,
         type: 2,
     };

@@ -58,7 +58,6 @@ async function upgrade(
 
     proxyOptions.txOverrides = feeOverriding;
 
-    // const factoryV2 = await hre.ethers.getContractFactory(CONTRACT_NAME_V2);
     const deploymentV2 = await hre.upgrades.upgradeProxy(
         PROXY_ADDRESS,
         factoryV2,

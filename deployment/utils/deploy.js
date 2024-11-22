@@ -10,7 +10,8 @@ async function deploy(
     initializationArgs = [],
     isUpgradeable = false,
     implConstructorArgs = [],
-    implForceDeploy = false
+    implForceDeploy = false,
+    isWriteDeploymentResult = true,
 ) {
     const [deployer] = await hre.ethers.getSigners();
 
@@ -20,7 +21,7 @@ async function deploy(
 
     const { factory, feeOverriding } = await Libs.estimateDeploy(
         artifactName,
-        implConstructorArgs
+        implConstructorArgs,
     );
 
     let deployment;
@@ -29,7 +30,7 @@ async function deploy(
             proxyOptions.constructorArgs = implConstructorArgs;
         }
 
-        if(implForceDeploy) {
+        if (implForceDeploy) {
             proxyOptions.redeployImplementation = "always";
         }
 
@@ -38,7 +39,7 @@ async function deploy(
         deployment = await hre.upgrades.deployProxy(
             factory,
             initializationArgs,
-            proxyOptions
+            proxyOptions,
         );
     } else {
         deployment = await factory.deploy(...initializationArgs, feeOverriding);
@@ -55,15 +56,17 @@ async function deploy(
         deployer,
         deploymentName != "" ? deploymentName : artifactName,
         contractAddress,
-        isUpgradeable
+        isUpgradeable,
     );
 
-    await Libs.writeDeploymentResult(
-        deploymentName != "" ? `${artifactName}$${deploymentName}` : artifactName,
-        implAddress,
-        initializationArgs,
-        isUpgradeable ? contractAddress : null
-    );
+    if (isWriteDeploymentResult) {
+        await Libs.writeDeploymentResult(
+            deploymentName != "" ? `${artifactName}$${deploymentName}` : artifactName,
+            implAddress,
+            initializationArgs,
+            isUpgradeable ? contractAddress : null,
+        );
+    }
 
     return deployedContract;
 }
@@ -71,7 +74,7 @@ async function deploy(
 async function deployBeacon(
     contractName,
     implConstructorArgs = [],
-    implForceDeploy = false
+    implForceDeploy = false,
 ) {
     const [deployer] = await hre.ethers.getSigners();
 
@@ -95,13 +98,16 @@ async function deployBeacon(
         beaconOptions.constructorArgs = implConstructorArgs;
     }
 
-    if(implForceDeploy) {
+    if (implForceDeploy) {
         beaconOptions.redeployImplementation = "always";
     }
 
     // proxyOptions.txOverrides = feeOverriding;
 
-    const beaconDeployment = await hre.upgrades.deployBeacon(factory, beaconOptions);
+    const beaconDeployment = await hre.upgrades.deployBeacon(
+        factory,
+        beaconOptions,
+    );
 
     const deployedBeacon = await beaconDeployment.waitForDeployment();
 
@@ -114,7 +120,7 @@ async function deployBeacon(
         deploymentName != "" ? deploymentName : artifactName,
         beaconAddress,
         true,
-        true
+        true,
     );
 
     await Libs.writeDeploymentResult(
@@ -122,7 +128,7 @@ async function deployBeacon(
         implAddress,
         implConstructorArgs,
         null,
-        beaconAddress
+        beaconAddress,
     );
 
     return beaconDeployment;
