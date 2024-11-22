@@ -11,7 +11,7 @@ async function deploy(
     isUpgradeable = false,
     implConstructorArgs = [],
     implForceDeploy = false,
-    isWriteDeploymentResult = true,
+    writeDeploymentResult = true,
 ) {
     const [deployer] = await hre.ethers.getSigners();
 
@@ -59,7 +59,7 @@ async function deploy(
         isUpgradeable,
     );
 
-    if (isWriteDeploymentResult) {
+    if (writeDeploymentResult) {
         await Libs.writeDeploymentResult(
             deploymentName != "" ? `${artifactName}$${deploymentName}` : artifactName,
             implAddress,
