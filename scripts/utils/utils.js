@@ -38,7 +38,7 @@ function erc1967AdminSlot() {
 }
 
 function _erc1967Slot(name) {
-    return ethers.toQuantity(BigInt(ethers.keccak256(Buffer.from(name))) - 1n);
+    return ethers.toBeHex(BigInt(ethers.keccak256(Buffer.from(name))) - 1n);
 }
 
 /**
