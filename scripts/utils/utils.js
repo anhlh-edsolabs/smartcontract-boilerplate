@@ -105,6 +105,20 @@ function getContractName(contractNameCompound) {
     return { artifactName, deploymentName };
 }
 
+function stringToBytes(input, length) {
+    let bytesValue = ethers.getBytes(
+        ethers.solidityPacked(["string"], [input]),
+    );
+
+    return bytesValue.length < length
+        ? ethers.zeroPadBytes(bytesValue, length)
+        : ethers.dataSlice(bytesValue, 0, length);
+}
+
+function hexToString(hexString) {
+    return ethers.toUtf8String(hexString).replace(/(\x00)/g, "");
+}
+
 module.exports = {
     Utils: {
         erc7201,
@@ -115,5 +129,7 @@ module.exports = {
         },
         iterateInputs,
         getContractName,
+        stringToBytes,
+        hexToString,
     },
 };

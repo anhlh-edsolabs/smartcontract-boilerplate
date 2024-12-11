@@ -15,6 +15,22 @@ const UpgradeableBeaconABI = require("./UpgradeableBeacon_ABI.json");
 
 const chainID = hre.network.config.chainId;
 
+const proxyOptions = {
+    kind: "uups",
+    timeout: 0,
+    pollingInterval: 20000,
+};
+
+const beaconOptions = {
+    kind: "beacon",
+    timeout: 0,
+    pollingInterval: 20000,
+};
+
+const defenderDefaultOptions = {
+    salt: "0x0000000000000000000000000000000000000000000000000000000000000000",
+};
+
 async function printDeploymentTime(deployer, isUpgrade = false) {
     log("====================================================");
     log("Start time: ", Date(Date.now()));
@@ -39,6 +55,9 @@ async function printDeploymentResult(
     isUpgrade = false,
     isBeacon = false,
 ) {
+    // wait for 3 seconds before fetching the implementation address
+    await sleep(3000);
+
     let impl = contractAddress;
 
     log("====================================================");
@@ -169,7 +188,7 @@ async function estimateDeploy(
         // fallback to default fee data
         feeData = {
             gasPrice: ethers.parseUnits("1", "gwei"),
-            maxFeePerGas: ethers.parseUnits("100", "gwei"),
+            maxFeePerGas: ethers.parseUnits("20", "gwei"),
             maxPriorityFeePerGas: ethers.parseUnits("1", "gwei"),
         };
     }
@@ -184,6 +203,11 @@ async function estimateDeploy(
     const estimatedGas = await hre.ethers.provider.estimateGas(deployTx);
 
     const networkGasPrice = feeData.gasPrice;
+    const maxFeePerGas =
+        feeData.maxFeePerGas || (networkGasPrice * 110n) / 100n; // set the MaxFeePerGas to 10% higher than gas price
+    const maxPriorityFeePerGas =
+        feeData.maxPriorityFeePerGas || ethers.parseUnits("1", "gwei");
+
     const estimatedCost = ethers.formatEther(estimatedGas * networkGasPrice);
 
     // log(`Estimated gas: ${estimatedGas.toBigInt().toLocaleString("en-GB")}`);
@@ -199,7 +223,7 @@ async function estimateDeploy(
     );
     log(
         `Max fee per gas: ${chalk.bold.red(
-            ethers.formatUnits(feeData.maxFeePerGas, "gwei"),
+            ethers.formatUnits(maxFeePerGas, "gwei"),
         )} gwei`,
     );
     log(
@@ -210,14 +234,39 @@ async function estimateDeploy(
         )} ${chalk.bold.red(await CoinBase())}`,
     );
 
-    const feeOverriding = {
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
-        maxFeePerGas: feeData.gasPrice * 110n / 100n, // set the MaxFeePerGas to 10% higher than gas price
-        baseFeePerGas: feeData.gasPrice,
-        type: 2,
-    };
+    const feeOverriding =
+        chainID == 97
+            ? { gasLimit: Number(estimatedGas) }
+            : {
+                  maxPriorityFeePerGas: Number(maxPriorityFeePerGas),
+                  maxFeePerGas: Number(maxFeePerGas),
+                  baseFeePerGas: Number(networkGasPrice),
+                  type: 2,
+              };
 
     return { factory, feeOverriding };
+}
+
+function getDefenderOptions(defenderOptions) {
+    if (!defenderOptions) return {};
+
+    const {
+        useDefenderDeploy = true,
+        verifySourceCode = false,
+        useCreate2,
+        salt,
+    } = defenderOptions;
+
+    const options = { useDefenderDeploy };
+
+    if (useDefenderDeploy) {
+        options.verifySourceCode = verifySourceCode;
+        if (useCreate2) {
+            options.salt = salt ?? defenderDefaultOptions.salt;
+        }
+    }
+
+    return options;
 }
 
 module.exports = {
@@ -228,5 +277,10 @@ module.exports = {
         getImplementationAddress,
         sleep,
         estimateDeploy,
+        getDefenderOptions,
     },
+    chainID,
+    proxyOptions,
+    beaconOptions,
+    defenderDefaultOptions,
 };

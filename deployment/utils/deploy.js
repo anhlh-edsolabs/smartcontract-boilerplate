@@ -1,9 +1,7 @@
 const hre = require("hardhat");
-const { Libs } = require("./libs");
 const { log } = require("console");
+const { Libs, proxyOptions, beaconOptions } = require("./libs");
 const { Utils } = require("../../scripts/utils/utils");
-
-const proxyOptions = { kind: "uups" };
 
 async function deploy(
     contractName,
@@ -12,37 +10,47 @@ async function deploy(
     implConstructorArgs = [],
     implForceDeploy = false,
     writeDeploymentResult = true,
+    gasLimit = 0,
+    defenderOptions = undefined,
 ) {
     const [deployer] = await hre.ethers.getSigners();
-
     await Libs.printDeploymentTime(deployer);
 
-    let { artifactName, deploymentName } = Utils.getContractName(contractName);
-
+    const { artifactName, deploymentName } =
+        Utils.getContractName(contractName);
     const { factory, feeOverriding } = await Libs.estimateDeploy(
         artifactName,
         implConstructorArgs,
     );
 
+    if (gasLimit > 0) {
+        feeOverriding.gasLimit = gasLimit;
+    }
+
     let deployment;
     if (isUpgradeable) {
-        if (implConstructorArgs.length > 0) {
-            proxyOptions.constructorArgs = implConstructorArgs;
-        }
-
-        if (implForceDeploy) {
-            proxyOptions.redeployImplementation = "always";
-        }
-
-        proxyOptions.txOverrides = feeOverriding;
+        // construct proxy deployment options
+        const proxyOpts = {
+            ...proxyOptions,
+            constructorArgs:
+                implConstructorArgs.length > 0
+                    ? implConstructorArgs
+                    : undefined,
+            redeployImplementation: implForceDeploy ? "always" : "never",
+            txOverrides: feeOverriding,
+            ...Libs.getDefenderOptions(defenderOptions),
+        };
 
         deployment = await hre.upgrades.deployProxy(
             factory,
             initializationArgs,
-            proxyOptions,
+            proxyOpts,
         );
     } else {
-        deployment = await factory.deploy(...initializationArgs, feeOverriding);
+        deployment = await factory.deploy(
+            ...implConstructorArgs,
+            feeOverriding,
+        );
     }
     // log("Deployment data:", deployment);
 
@@ -50,18 +58,16 @@ async function deploy(
     const deployedContract = await deployment.waitForDeployment();
     const contractAddress = await deployedContract.getAddress();
 
-    await Libs.sleep(3000);
-
     const implAddress = await Libs.printDeploymentResult(
         deployer,
-        deploymentName != "" ? deploymentName : artifactName,
+        deploymentName || artifactName,
         contractAddress,
         isUpgradeable,
     );
 
     if (writeDeploymentResult) {
         await Libs.writeDeploymentResult(
-            deploymentName != "" ? `${artifactName}$${deploymentName}` : artifactName,
+            deploymentName ? `${artifactName}$${deploymentName}` : artifactName,
             implAddress,
             initializationArgs,
             isUpgradeable ? contractAddress : null,
@@ -87,12 +93,6 @@ async function deployBeacon(
     //     implConstructorArgs
     // );
     const factory = await hre.ethers.getContractFactory(artifactName);
-
-    const beaconOptions = {
-        kind: "beacon",
-        timeout: 0,
-        pollingInterval: 20000,
-    };
 
     if (implConstructorArgs.length > 0) {
         beaconOptions.constructorArgs = implConstructorArgs;
@@ -124,7 +124,9 @@ async function deployBeacon(
     );
 
     await Libs.writeDeploymentResult(
-        deploymentName != "" ? `${artifactName}$${deploymentName}` : artifactName,
+        deploymentName != ""
+            ? `${artifactName}$${deploymentName}`
+            : artifactName,
         implAddress,
         implConstructorArgs,
         null,

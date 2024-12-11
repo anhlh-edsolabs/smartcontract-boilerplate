@@ -2,14 +2,17 @@ const hre = require("hardhat");
 const fs = require("fs");
 const chalk = require("chalk");
 const { log } = require("console");
-const { Libs } = require("./libs");
+const {
+    Libs,
+    chainID,
+    proxyOptions,
+    defenderDefaultOptions,
+} = require("./libs");
 const { Utils } = require("../../scripts/utils/utils");
 const {
     Constants: { ENV_KEY },
     DeploymentStorage,
 } = require("../../scripts/utils/env");
-
-const proxyOptions = { kind: "uups" };
 
 async function upgrade(
     contractNameV1,
@@ -17,6 +20,9 @@ async function upgrade(
     implConstructorArgs = [],
     implForceDeploy = false,
     skipStorageCheck = false,
+    writeDeploymentResult = true,
+    gasLimit = 0,
+    defenderOptions = undefined,
 ) {
     const [deployer] = await hre.ethers.getSigners();
 
@@ -44,6 +50,10 @@ async function upgrade(
         implConstructorArgs,
     );
 
+    if (gasLimit > 0) {
+        feeOverriding.gasLimit = gasLimit;
+    }
+
     if (implConstructorArgs.length > 0) {
         proxyOptions.constructorArgs = implConstructorArgs;
     }
@@ -58,14 +68,22 @@ async function upgrade(
 
     proxyOptions.txOverrides = feeOverriding;
 
+    const proxyOpts = {
+        ...proxyOptions,
+        constructorArgs:
+            implConstructorArgs.length > 0 ? implConstructorArgs : undefined,
+        txOverrides: feeOverriding,
+        ...Libs.getDefenderOptions(defenderOptions),
+    };
+
     const deploymentV2 = await hre.upgrades.upgradeProxy(
         PROXY_ADDRESS,
         factoryV2,
         proxyOptions,
     );
 
-    // const contractV2 = await deploymentV2.waitForDeployment();
-    await Libs.sleep(3000);
+    // wait for the upgrade to be completed
+    await deploymentV2.waitForDeployment();
 
     const implAddress = await Libs.printDeploymentResult(
         deployer,
@@ -74,17 +92,19 @@ async function upgrade(
         true,
     );
 
-    await Libs.writeDeploymentResult(
-        deploymentNameV2 != ""
-            ? `${artifactNameV2}$${deploymentNameV2}`
-            : artifactNameV2,
-        implAddress,
-        [],
-        PROXY_ADDRESS,
-        null,
-        previousImpl,
-        true,
-    );
+    if (writeDeploymentResult) {
+        await Libs.writeDeploymentResult(
+            deploymentNameV2
+                ? `${artifactNameV2}$${deploymentNameV2}`
+                : artifactNameV2,
+            implAddress,
+            [],
+            PROXY_ADDRESS,
+            null,
+            previousImpl,
+            true,
+        );
+    }
 
     return deploymentV2;
 }
