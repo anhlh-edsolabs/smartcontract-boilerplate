@@ -40,48 +40,80 @@ module.exports = {
         local: {
             url: "http://127.0.0.1:8545/",
             chainId: 31337,
-            accounts: [Constants.DEPLOYER_PK],
+            accounts: [process.env.DEPLOYER_PK_DEV1],
         },
         sepolia: {
-            url: process.env.RPC_PROVIDER_DEV,
+            url: process.env.RPC_PROVIDER_DEV1,
             chainId: 11155111,
             // gasPrice: GAS_PRICE * GAS_UNIT * 2,
-            accounts: [Constants.DEPLOYER_PK],
-            from: Constants.DEPLOYER_ADDR,
+            accounts: [process.env.DEPLOYER_PK_DEV1],
+            from: process.env.DEPLOYER_DEV1,
         },
         polygonAmoy: {
-            url: process.env.OKLINK_PROVIDER_DEV,
+            url: process.env.RPC_PROVIDER_DEV2,
             chainId: 80002,
-            accounts: [Constants.DEPLOYER_PK],
-            from: Constants.DEPLOYER_ADDR,
+            accounts: [process.env.DEPLOYER_PK_DEV2],
+            from: process.env.DEPLOYER_DEV2,
+        },
+        bscTestnet: {
+            url: process.env.RPC_PROVIDER_DEV3,
+            chainId: 97,
+            accounts: [process.env.DEPLOYER_PK_DEV3],
+            from: process.env.DEPLOYER_DEV3,
         },
         mainnet: {
-            url: process.env.RPC_PROVIDER_PROD,
+            url: process.env.RPC_PROVIDER_PROD1,
             chainId: 1,
-            accounts: [Constants.DEPLOYER_PK],
-            from: Constants.DEPLOYER_ADDR,
+            accounts: [process.env.DEPLOYER_PK_PROD1],
+            from: process.env.DEPLOYER_PROD1,
         },
+        polygon: {
+            url: process.env.RPC_PROVIDER_PROD2,
+            chainId: 137,
+            accounts: [process.env.DEPLOYER_PK_PROD3],
+            from: process.env.DEPLOYER_PK_PROD3,
+        },
+        bsc: {
+            url: process.env.RPC_PROVIDER_PROD3,
+            chainId: 56,
+            accounts: [process.env.DEPLOYER_PK_PROD3],
+            from: process.env.DEPLOYER_PK_PROD3,
+        }
+    },
+    defender: {
+        apiKey: process.env.DEFENDER_API_KEY,
+        apiSecret: process.env.DEFENDER_API_SECRET,        
     },
     etherscan: {
         apiKey: {
             mainnet: process.env.ETHERSCAN_API_KEY,
             sepolia: process.env.ETHERSCAN_API_KEY,
             polygon: process.env.POLYGONSCAN_API_KEY,
-            polygonAmoy: process.env.OKLINK_API_KEY,
+            polygonAmoy: process.env.POLYGONSCAN_API_KEY,
+            bsc: process.env.BSCSCAN_API_KEY,
+            bscTestnet: process.env.BSCSCAN_API_KEY,
         },
         customChains: [
             {
                 network: "polygonAmoy",
                 chainId: 80002,
                 urls: {
-                    apiURL: "https://www.oklink.com/api/v5/explorer/contract/verify-source-code",
-                    browserURL: "https://www.oklink.com/polygonAmoy",
+                    apiURL: "https://api-amoy.polygonscan.com/api",
+                    browserURL: "https://amoy.polygonscan.com/",
                 },
             },
+            {
+                network: "bscTestnet",
+                chainId: 97,
+                urls: {
+                    apiURL: "https://api-testnet.bscscan.com/api",
+                    browserURL: "https://testnet.bscscan.com/",
+                },
+            }
         ],
     },
     solidity: {
-        version: "0.8.20",
+        version: "0.8.28",
         settings: {
             optimizer: {
                 enabled: true,
@@ -109,8 +141,7 @@ module.exports = {
         coinmarketcap: process.env.COINMARKETCAP_API_KEY,
         enabled: process.env.REPORT_GAS ? true : false,
         L1: "ethereum",
-        L1Etherscan: `&apiKey=${process.env.ETHERSCAN_API_KEY}`,
-        gasPrice: 3,
+        L1Etherscan: `${process.env.ETHERSCAN_API_KEY}`,
         currencyDisplayPrecision: 5,
         includeIntrinsicGas: true,
         proxyResolver: new OZResolver(),
