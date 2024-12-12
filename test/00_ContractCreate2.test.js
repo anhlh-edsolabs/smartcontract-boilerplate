@@ -3,6 +3,7 @@ const ethers = require("ethers");
 const hre = require("hardhat");
 const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+const { Utils } = require("../scripts/utils/utils");
 const { init } = require("./fixtures/fixture.ContractCreate2");
 
 describe("ContractCreate2", function () {
@@ -276,7 +277,7 @@ describe("ContractCreate2", function () {
 
             console.log("Precomputed proxy address:", precomputedProxyAddress);
 
-            const [creationCode, initCodeHash, computedAddress] =
+            const [, , computedAddress] =
                 await contractCreate2.computeProxyAddress(
                     salt,
                     deployedTokenAddress,
@@ -314,6 +315,19 @@ describe("ContractCreate2", function () {
             expect(await tokenProxy.symbol()).to.equal("CUR");
             expect(await tokenProxy.decimals()).to.equal(6);
             expect(await tokenProxy.owner()).to.equal(deployer.address);
+
+            const readImplSlot = await hre.ethers.provider.getStorage(
+                deployedProxyAddress,
+                Utils.erc1967Slot.Implementation(),
+            );
+
+            const implAddressFromStorage =
+                ethers.AbiCoder.defaultAbiCoder().decode(
+                    ["address"],
+                    readImplSlot,
+                )[0];
+
+            expect(implAddressFromStorage).to.equal(deployedTokenAddress);
         });
     });
 });
