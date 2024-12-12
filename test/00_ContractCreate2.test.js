@@ -148,12 +148,7 @@ describe("ContractCreate2", function () {
 
     describe("Contract deployment", function () {
         it("Should deploy a new token using the ContractCreate2 contract", async function () {
-            const {
-                deployer,
-                contractCreate2,
-                TokenFactory,
-                ERC1967ProxyFactory,
-            } = await loadFixture(init);
+            const { contractCreate2, TokenFactory } = await loadFixture(init);
 
             const salt = ethers.zeroPadValue("0x01", 32); //0x0000000000000000000000000000000000000000000000000000000000000001
             const tokenEncodedConstructorArgs =
