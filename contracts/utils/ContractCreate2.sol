@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 contract ContractCreate2 is Base {
     event Deployed(address addr, bytes32 salt);
 
+    error FailedDeployment();
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -89,19 +91,55 @@ contract ContractCreate2 is Base {
             abi.encode(impl, _data)
         );
 
-        assembly {
-            proxy := create2(
-                callvalue(),
-                add(initCode, 0x20),
-                mload(initCode),
-                salt
-            )
+        proxy = _deploy(msg.value, salt, initCode, true);
+    }
 
-            if iszero(extcodesize(proxy)) {
-                revert(0, 0)
+    function deployImpl(
+        bytes32 salt,
+        bytes calldata deployedBytecode,
+        bytes calldata encodedConstructorArgs
+    ) external payable returns (address impl) {
+        bytes memory initCode = abi.encodePacked(
+            deployedBytecode,
+            encodedConstructorArgs
+        );
+
+        impl = _deploy(msg.value, salt, initCode, true);
+    }
+
+    function _deploy(
+        uint256 amount,
+        bytes32 salt,
+        bytes memory initCode,
+        bool useCreate2
+    ) internal returns (address addr) {
+        if (useCreate2) {
+            assembly ("memory-safe") {
+                addr := create2(
+                    amount,
+                    add(initCode, 0x20),
+                    mload(initCode),
+                    salt
+                )
+
+                if iszero(extcodesize(addr)) {
+                    revert(0, 0)
+                }
+            }
+        } else {
+            assembly ("memory-safe") {
+                addr := create(amount, add(initCode, 0x20), mload(initCode))
+
+                if iszero(addr) {
+                    revert(0, 0)
+                }
             }
         }
 
-        emit Deployed(proxy, salt);
+        if (addr == address(0)) {
+            revert FailedDeployment();
+        }
+
+        emit Deployed(addr, salt);
     }
 }

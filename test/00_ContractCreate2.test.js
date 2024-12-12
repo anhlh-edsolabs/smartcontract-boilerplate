@@ -40,7 +40,7 @@ describe("ContractCreate2", function () {
         });
     });
 
-    describe("Proxy deployment", function () {
+    describe("Contract address computation", function () {
         it("Should compute the correct address for the proxy", async function () {
             const {
                 deployer,
@@ -100,19 +100,8 @@ describe("ContractCreate2", function () {
                     tokenEncodedInitializationCall,
                 );
 
-            console.log(
-                "ContractCreate2 Computed proxy address:",
-                computedAddress,
-            );
-            console.log(
-                "ContractCreate2 Computed init code hash:",
-                initCodeHash,
-            );
-            console.log(
-                "ContractCreate2 Computed creation code:",
-                creationCode,
-            );
-
+            expect(creationCode).to.equal(ERC1967ProxyFactory.bytecode);
+            expect(initCodeHash).to.equal(proxyInitCodeHash);
             expect(computedAddress).to.equal(precomputedAddress);
         });
 
@@ -153,6 +142,178 @@ describe("ContractCreate2", function () {
             console.log("ContractCreate2 Computed impl address:", implAddress);
 
             expect(implAddress).to.equal(precomputedTokenAddress);
+        });
+    });
+
+    describe("Contract deployment", function () {
+        it("Should deploy a new token using the ContractCreate2 contract", async function () {
+            const {
+                deployer,
+                contractCreate2,
+                TokenFactory,
+                ERC1967ProxyFactory,
+            } = await loadFixture(init);
+
+            const salt = ethers.zeroPadValue("0x01", 32); //0x0000000000000000000000000000000000000000000000000000000000000001
+            const tokenEncodedConstructorArgs =
+                ethers.AbiCoder.defaultAbiCoder().encode(["uint8"], [6]);
+
+            const tokenInitCodeHash = ethers.solidityPackedKeccak256(
+                ["bytes", "bytes"],
+                [TokenFactory.bytecode, tokenEncodedConstructorArgs],
+            );
+
+            const precomputedTokenAddress = ethers.getCreate2Address(
+                contractCreate2.target,
+                salt,
+                tokenInitCodeHash,
+            );
+
+            console.log(
+                "Precomputed token implementation address:",
+                precomputedTokenAddress,
+            );
+
+            const tokenImplAddress = await contractCreate2.computeImplAddress(
+                salt,
+                TokenFactory.bytecode,
+                tokenEncodedConstructorArgs,
+            );
+
+            await expect(
+                contractCreate2.deployImpl(
+                    salt,
+                    TokenFactory.bytecode,
+                    tokenEncodedConstructorArgs,
+                ),
+            )
+                .to.emit(contractCreate2, "Deployed")
+                .withArgs(tokenImplAddress, salt);
+
+            const events = await contractCreate2.queryFilter(
+                "Deployed",
+                "latest",
+            );
+            expect(events.length).to.equal(1);
+
+            const deployedTokenAddress = events[0].args[0];
+
+            expect(events[0].args[0]).to.properAddress;
+            expect(events[0].args[0]).to.deep.equal(precomputedTokenAddress);
+            expect(events[0].args[0]).to.deep.equal(tokenImplAddress);
+
+            expect(await hre.ethers.provider.getCode(deployedTokenAddress)).to
+                .not.be.empty;
+        });
+
+        it("Should deploy a new proxy using the ContractCreate2 contract", async function () {
+            const {
+                deployer,
+                contractCreate2,
+                TokenFactory,
+                ERC1967ProxyFactory,
+            } = await loadFixture(init);
+
+            const salt = ethers.zeroPadValue("0x01", 32); //0x0000000000000000000000000000000000000000000000000000000000000001
+            const tokenEncodedConstructorArgs =
+                ethers.AbiCoder.defaultAbiCoder().encode(["uint8"], [6]);
+
+            const tokenInitCodeHash = ethers.solidityPackedKeccak256(
+                ["bytes", "bytes"],
+                [TokenFactory.bytecode, tokenEncodedConstructorArgs],
+            );
+
+            const tokenImplAddress = await contractCreate2.computeImplAddress(
+                salt,
+                TokenFactory.bytecode,
+                tokenEncodedConstructorArgs,
+            );
+
+            await expect(
+                contractCreate2.deployImpl(
+                    salt,
+                    TokenFactory.bytecode,
+                    tokenEncodedConstructorArgs,
+                ),
+            )
+                .to.emit(contractCreate2, "Deployed")
+                .withArgs(tokenImplAddress, salt);
+
+            const events = await contractCreate2.queryFilter(
+                "Deployed",
+                "latest",
+            );
+            expect(events.length).to.equal(1);
+
+            const deployedTokenAddress = events[0].args[0];
+
+            expect(await hre.ethers.provider.getCode(deployedTokenAddress)).to
+                .not.be.empty;
+
+            const tokenEncodedInitializationCall =
+                TokenFactory.interface.encodeFunctionData("initialize", [
+                    "Currency",
+                    "CUR",
+                    deployer.address,
+                ]);
+
+            const proxyInitCodeHash = ethers.solidityPackedKeccak256(
+                ["bytes", "bytes"],
+                [
+                    ERC1967ProxyFactory.bytecode,
+                    ethers.AbiCoder.defaultAbiCoder().encode(
+                        ["address", "bytes"],
+                        [deployedTokenAddress, tokenEncodedInitializationCall],
+                    ),
+                ],
+            );
+
+            const precomputedProxyAddress = ethers.getCreate2Address(
+                contractCreate2.target,
+                salt,
+                proxyInitCodeHash,
+            );
+
+            console.log("Precomputed proxy address:", precomputedProxyAddress);
+
+            const [creationCode, initCodeHash, computedAddress] =
+                await contractCreate2.computeProxyAddress(
+                    salt,
+                    deployedTokenAddress,
+                    tokenEncodedInitializationCall,
+                );
+
+            expect(precomputedProxyAddress).to.equal(computedAddress);
+
+            await expect(
+                contractCreate2.deployProxy(
+                    salt,
+                    deployedTokenAddress,
+                    tokenEncodedInitializationCall,
+                ),
+            )
+                .to.emit(contractCreate2, "Deployed")
+                .withArgs(precomputedProxyAddress, salt);
+
+            const proxyEvents = await contractCreate2.queryFilter(
+                "Deployed",
+                "latest",
+            );
+            expect(proxyEvents.length).to.equal(1);
+
+            const deployedProxyAddress = proxyEvents[0].args[0];
+            expect(deployedProxyAddress).to.properAddress;
+            expect(deployedProxyAddress).to.deep.equal(precomputedProxyAddress);
+
+            expect(await hre.ethers.provider.getCode(deployedProxyAddress)).to
+                .not.be.empty;
+
+            const tokenProxy = TokenFactory.attach(deployedProxyAddress);
+
+            expect(await tokenProxy.name()).to.equal("Currency");
+            expect(await tokenProxy.symbol()).to.equal("CUR");
+            expect(await tokenProxy.decimals()).to.equal(6);
+            expect(await tokenProxy.owner()).to.equal(deployer.address);
         });
     });
 });
