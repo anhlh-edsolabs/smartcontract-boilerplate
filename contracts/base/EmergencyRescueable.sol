@@ -23,6 +23,7 @@ abstract contract EmergencyRescueable {
         address recipient,
         uint256 amount
     ) external virtual {
+        _authorizeRescue();
         Validation.noZeroAddress(token);
         Validation.noZeroAddress(recipient);
         Validation.noZeroAmount(amount);
@@ -35,6 +36,8 @@ abstract contract EmergencyRescueable {
 
         emit FundRescued(token, recipient, amount, block.timestamp);
     }
+
+    function _authorizeRescue() internal virtual;
 
     receive() external virtual payable {
         _fallback();
