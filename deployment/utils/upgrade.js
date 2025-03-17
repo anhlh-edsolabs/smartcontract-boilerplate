@@ -1,3 +1,4 @@
+require("@openzeppelin/hardhat-upgrades");
 const hre = require("hardhat");
 const fs = require("fs");
 const chalk = require("chalk");
@@ -18,6 +19,7 @@ async function upgrade(
     contractNameV1,
     contractNameV2 = contractNameV1,
     implConstructorArgs = [],
+    reinitializer = "" | {},
     implForceDeploy = false,
     skipStorageCheck = false,
     writeDeploymentResult = true,
@@ -54,24 +56,16 @@ async function upgrade(
         feeOverriding.gasLimit = gasLimit;
     }
 
-    if (implConstructorArgs.length > 0) {
-        proxyOptions.constructorArgs = implConstructorArgs;
-    }
-
-    if (implForceDeploy) {
-        proxyOptions.redeployImplementation = "always";
-    }
-
-    if (skipStorageCheck) {
-        proxyOptions.unsafeSkipStorageCheck = skipStorageCheck;
-    }
-
-    proxyOptions.txOverrides = feeOverriding;
-
     const proxyOpts = {
         ...proxyOptions,
         constructorArgs:
             implConstructorArgs.length > 0 ? implConstructorArgs : undefined,
+        call:
+            reinitializer != "" && reinitializer != {}
+                ? reinitializer
+                : undefined,
+        redeployImplementation: implForceDeploy ? "always" : "onchange",
+        unsafeSkipStorageCheck: skipStorageCheck,
         txOverrides: feeOverriding,
         ...Libs.getDefenderOptions(defenderOptions),
     };
@@ -79,7 +73,7 @@ async function upgrade(
     const deploymentV2 = await hre.upgrades.upgradeProxy(
         PROXY_ADDRESS,
         factoryV2,
-        proxyOptions,
+        proxyOpts,
     );
 
     // wait for the upgrade to be completed
@@ -94,14 +88,13 @@ async function upgrade(
 
     if (writeDeploymentResult) {
         await Libs.writeDeploymentResult(
-            deploymentNameV2
-                ? `${artifactNameV2}$${deploymentNameV2}`
-                : artifactNameV2,
+            deploymentNameV2 ? contractNameV2 : artifactNameV2,
             implAddress,
             [],
             PROXY_ADDRESS,
             null,
             previousImpl,
+            contractNameV1,
             true,
         );
     }

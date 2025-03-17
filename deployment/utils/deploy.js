@@ -36,7 +36,7 @@ async function deploy(
                 implConstructorArgs.length > 0
                     ? implConstructorArgs
                     : undefined,
-            redeployImplementation: implForceDeploy ? "always" : "never",
+            redeployImplementation: implForceDeploy ? "always" : "onchange",
             txOverrides: feeOverriding,
             ...Libs.getDefenderOptions(defenderOptions),
         };

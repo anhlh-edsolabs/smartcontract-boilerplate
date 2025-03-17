@@ -1,5 +1,324 @@
 {
-    "DEV": {},
-	"UAT": {},
-	"PROD": {}
+	"DEV": {
+		"Swap": {
+			"ChainID": 11155111,
+			"Proxy": "0x7Cea40f250Da7B53231DCb47FCCBB885Ccd6C824",
+			"Beacon": null,
+			"Impl": "0xbf77E52DB4262E7bFb2274fabf0775419a74f9E7",
+			"InitializationArgs": [
+				"0x056DFf6F1461AE35dc148C0fb2fdDAB9a7849460"
+			],
+			"PreviousImplementations": [
+				"0xd0b9A9062759C1B4Fc6f4e34E7514782f2dD1Be8",
+				"0x901c92A1D1be0de97975Ca2fF33A592178282f25",
+				"0xf59331E664613778D4A1FBf1360a94109D81D18F",
+				"0xD1EAA8f4F839a3D3EB7eade799fDfBCdF8872F3f",
+				"0xb6F981373cBccbC8e011bbBea1C47689b97C3088",
+				"0x2Fb7c844a79cC865d6AB0B2095253DEd6A9da393"
+			]
+		},
+		"MockToken$USDT": {
+			"ChainID": 11155111,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0x2eA755250F9620a6C66B0Cd0D41740e3EaEc1765",
+			"InitializationArgs": [
+				"Test USDT",
+				"TUSDT",
+				6
+			]
+		},
+		"MockToken$WUSD": {
+			"ChainID": 11155111,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0xE29d93aCc7a860756253fC849b51C76E1fe1aE18",
+			"InitializationArgs": [
+				"Test WUSD",
+				"TWUSD",
+				6
+			]
+		},
+		"MockToken$USDC": {
+			"ChainID": 11155111,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0xd10476c2b592b9a0b8d16b0b30423b68420812a6",
+			"InitializationArgs": [
+				"TUSDC",
+				"TUSDC",
+				6
+			]
+		},
+		"CurrencyUpgradeable$WUSDv2": {
+			"ChainID": 11155111,
+			"Proxy": "0xdba2bE0980fEe37a2917842649EB09BC2036DD50",
+			"Beacon": null,
+			"Impl": "0x20e4c1729Ed9c7B52fdA2E59619c0DFa21bdBfF3",
+			"InitializationArgs": [
+				"Worldwide USD",
+				"WUSD",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"StakingV2": {
+			"ChainID": 11155111,
+			"Proxy": "0xbAA2762B22F46c72337E6c8Fb6F7A03c9aA9BD82",
+			"Beacon": null,
+			"Impl": "0x7C920298c4fab7632287bAE0d520644f606255F1",
+			"InitializationArgs": [
+				"0x6D1c86A6d27b61C8969a629192040573582F4047",
+				"0x056DFf6F1461AE35dc148C0fb2fdDAB9a7849460",
+				50000,
+				172800
+			],
+			"PreviousImplementations": [
+				"0xD054C4e57A47DCC663B1D6F0cd41Db09D65E8497",
+				"0x8e31D0B486Ec9cf228A48F0F5441845C63A830c7",
+				"0xD054C4e57A47DCC663B1D6F0cd41Db09D65E8497",
+				"0x8e31D0B486Ec9cf228A48F0F5441845C63A830c7",
+				"0x8e31D0B486Ec9cf228A48F0F5441845C63A830c7",
+				"0x6d843dB7958E2160256a9fdf59d5a31B8e9878ff",
+				"0x0c701E46AaF1508e340AbdfD1A73c06536a4567D",
+				"0x282A11FE85E7DE105663480E349B7251C0203c48",
+				"0x71d125860A2397976bb94bbdE28D0Ece930b95FB",
+				"0x30288Ef8253cfDd9F85D8D2E1DDcBF33175C8007",
+				"0x6510E4989EEC55F509bD6E4e6c9F437F8b21fb41",
+				"0xA89fe166b51a3Ed3aB8b90075cFdf98B57b41083",
+				"0x8DbBa40dcee60D43e6454fB50a41Eb7d6F047C90",
+				"0xF64f78C76E59b5D93A7899ab2d2ac198278b5Ca4",
+				"0xFa52c488415C2C2eA9fad154299C73CAF8f61FE1",
+				"0xbEa49237a76f4f902eBD91464f7750b0Ed7370F3",
+				"0xb9A13093D2baB343194E51200006D31365C8bD4c",
+				"0xfe99c36efAE45CbF9da7A6A0f9aEE099a0d95E5c",
+				"0xa152F6EfF9Bc8CFcB535fb254613c77766b1814B",
+				"0xe03aACA2666093ECc27c98bc156fcCFae939FC0c",
+				"0x42754EA05Ce2ED7609f05C0682e60f921e4cf671",
+				"0x35c267bD8a4CBe7B72de6Fe78C3A6a1bb9835772",
+				"0xc7D6C6E2fCeEf628b0752f4454B4dfbF628c3149",
+				"0x457D6C0B7eb3C412AAd1bbEa559d811B4e5b86BE"
+			],
+			"PreviousContractNames": [
+				"Staking"
+			]
+		},
+		"SoftStakingV2": {
+			"ChainID": 11155111,
+			"Proxy": "0xe82108DCe697746E73f2c286C6130A61Cf43B5cf",
+			"Beacon": null,
+			"Impl": "0x5BfA2c53206654b9d0f444805CB0Be83F64d20d0",
+			"InitializationArgs": [
+				"0x6D1c86A6d27b61C8969a629192040573582F4047",
+				"0x35e9FA7061EFaA9c7644035A5101AE52Bc27f673",
+				"0x6517A1442fb980ceE21E1cEcecABdd0337277ef3",
+				"0x2c18212A17252D139035a1429BE4737582610058",
+				"0x056DFf6F1461AE35dc148C0fb2fdDAB9a7849460"
+			],
+			"PreviousImplementations": [
+				"0xa4e69998F69616Ee34f681910CE0d9F1117d4F1B",
+				"0xC1018EB1bB11FcfAf1287A40dA74493E1F007E29",
+				"0x0eEe062294d605f4b021a4Fba46f4Ef9c2bE1DDb",
+				"0x3fB8b95d4240927B8a755b5Ca12BAa9BF652156d",
+				"0x926024812AB87E1Dcb521C2124ebD35859a2E051"
+			],
+			"PreviousContractNames": [
+				"SoftStaking"
+			]
+		}
+	},
+	"STG": {
+		"Swap": {
+			"ChainID": 11155111,
+			"Proxy": "0xc1EB9abff5e868eB87C0dD0AF4d1907b298a3b84",
+			"Beacon": null,
+			"Impl": "0xbf77E52DB4262E7bFb2274fabf0775419a74f9E7",
+			"InitializationArgs": [
+				"0x12dE9682513438725dB3c7437Fc9a8436538E3b2",
+				"0x4F9FaDa461a9C6Fdc4500C19cb68FB0D7c1687a1"
+			],
+			"PreviousImplementations": [
+				"0x901c92A1D1be0de97975Ca2fF33A592178282f25",
+				"0xD1EAA8f4F839a3D3EB7eade799fDfBCdF8872F3f",
+				"0xb6F981373cBccbC8e011bbBea1C47689b97C3088"
+			]
+		},
+		"MockToken$USDT": {
+			"ChainID": 11155111,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0xcd802A3E6D2F7d56170A2E1C389de83Ee9EBAA23",
+			"InitializationArgs": [
+				"Test USDT",
+				"STG-USDT",
+				6
+			]
+		},
+		"MockToken$WUSD": {
+			"ChainID": 11155111,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0xB31Dc642eCa4D6b7912227AD620e96d90d52A92c",
+			"InitializationArgs": [
+				"Test WUSD",
+				"STG-WUSD",
+				6
+			]
+		},
+		"MockToken$USDC": {
+			"ChainID": 11155111,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0xCAa658FA410F00f6613A71ac96946065d97193e8",
+			"InitializationArgs": [
+				"Test USDC",
+				"STG-USDC",
+				6
+			]
+		},
+		"CurrencyUpgradeable$WUSDv2": {
+			"ChainID": 11155111,
+			"Proxy": "0x371607f7463D27ae9deAf64aE00da9cbd4Cf0065",
+			"Beacon": null,
+			"Impl": "0x26eB2712ac91AfA3b79cAE97b32104682D4c2a24",
+			"InitializationArgs": [
+				"Worldwide USD",
+				"WUSD",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"StakingV2": {
+			"ChainID": 11155111,
+			"Proxy": "0x253Af83acFb8C35270a75D586DE68c04Ab2C065f",
+			"Beacon": null,
+			"Impl": "0xB0BD00472d0107aa31502885809A16B23B4f1e4a",
+			"InitializationArgs": [
+				"0x12dE9682513438725dB3c7437Fc9a8436538E3b2",
+				"0x5Ec0C22d7EbdfcBF82295407c90BF1369baDB3b9",
+				50000,
+				172800
+			],
+			"PreviousImplementations": [
+				"0x3a8924e94ee848820A4387d05a7FA0d9C5e6Dde1",
+				"0x3a8924e94ee848820A4387d05a7FA0d9C5e6Dde1",
+				"0xa6F79b8686b6cC20e7c868D073EC6E4b895e3187",
+				"0xf6fd6116250D194d36e3e1926f6a35829C2bD66a",
+				"0x0eFaD347A4b80CE01E049C327080e8E317eC99a6",
+				"0x626f8626af71dB53411fc4C465A5d91f89586B82",
+				"0x6907e3244A584701F5Cd8f64c2b7914e3515609e",
+				"0x894F54F92c1582146c672caB9cBF46AA176443ac",
+				"0xb3017D764056A6d83649179215DBA33fdDBf9D6F",
+				"0xb2cdCce859CA06c7A3beA69F3B753374AC2b92F4",
+				"0x16eC18b4F35085723e0a711b9927c0958deA2B28",
+				"0x8A6363672198DbFbD9148a7b61C96DfCc29aFC2a",
+				"0xa2A59F86496bb903FA2c52D5f23e30F382dEd5a0"
+			],
+			"PreviousContractNames": [
+				"Staking"
+			]
+		},
+		"SoftStakingV2": {
+			"ChainID": 11155111,
+			"Proxy": "0x2c25E843C664C81f2458C515730863EEeF1eaBF9",
+			"Beacon": null,
+			"Impl": "0xdE0D2d40F7490B4EF1AB8436AF2B226791E47F1f",
+			"InitializationArgs": [
+				"0x12dE9682513438725dB3c7437Fc9a8436538E3b2",
+				"0x90c760293032016331e530C9D2f65884bb391C74",
+				"0x8682E7af26083c7091656bB28Ab3125b9A9a7f28",
+				"0x3A12dcD58937b1374d6Fa566F8309E62412A5C38",
+				"0x4F9FaDa461a9C6Fdc4500C19cb68FB0D7c1687a1"
+			],
+			"PreviousImplementations": [
+				"0x246Abbc9bbebf949A9230960a7b3f27b97521332",
+				"0x6f6Fcb168FC916D72DFb3B8d93d1fe0d2d4C60E2",
+				"0x271CD02d43De17CE426161C3BAF6FBdd19abcBce"
+			],
+			"PreviousContractNames": [
+				"SoftStaking"
+			]
+		}
+	},
+	"PROD": {
+		"Swap": {
+			"ChainID": 1,
+			"Proxy": "0xc5d7a63768d05E0F344f4798E6560441ff6fa984",
+			"Beacon": null,
+			"Impl": "0xf397Be8F8d20543F2fB92D4f423ac62E79D57e4C",
+			"InitializationArgs": [
+				"0xF1e2C6154D42d8E1768EC065B6A649163D906f7c",
+				"0x4a149e1a3DF4E62C22543184AB0D6211277dbb39"
+			],
+			"PreviousImplementations": [
+				"0x74A873c150be3D4d1f994D4B6F6c1956Dc48109A",
+				"0x5cc44Cdb9958c2c9E67D8b8A8e90Ff7bDE46BaEF",
+				"0x330bD6C23f04c09ca048e328De4bbec9E644444b"
+			]
+		},
+		"MockToken$USDT": {
+			"ChainID": 1,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+			"InitializationArgs": []
+		},
+		"MockToken$WUSD": {
+			"ChainID": 1,
+			"Proxy": null,
+			"Beacon": null,
+			"Impl": "0xb6667b04Cb61Aa16B59617f90FFA068722Cf21dA",
+			"InitializationArgs": []
+		},
+		"CurrencyUpgradeable$WUSDv2": {
+			"ChainID": 1,
+			"Proxy": "0x7Cd017ca5ddb86861FA983a34b5F495C6F898c41",
+			"Beacon": null,
+			"Impl": "0x3AC7b6769c5e4a5c17986bD39D9d8b2E9E09227E",
+			"InitializationArgs": [
+				"Worldwide USD",
+				"WUSD",
+				"0x731Efdc933464ed81Bf3Ea961e9fDAdC62e83bd1",
+				"0x1a41b5922E926Cca1EAa8afAC55bdDce40FDBe61",
+				"0xa2fAA105883af5CbEF6F95826Db420E5AB5594fC"
+			]
+		},
+		"StakingV2": {
+			"ChainID": 1,
+			"Proxy": "0x338b1646956854A27dbA6dF6B8a3D38949EEBc7f",
+			"Beacon": null,
+			"Impl": "0x7f8335f0e12B07DA79aed325A04B7164C3adCa1c",
+			"InitializationArgs": [
+				"0xF1e2C6154D42d8E1768EC065B6A649163D906f7c",
+				"0x85C6598Cc1038504D0B64964aAF9f293b99f2802",
+				50000,
+				172800
+			],
+			"PreviousImplementations": [
+				"0x86dBE62791514251c9320E74809D7aD118bE87fE",
+				"0x28886a14490Db76314bdc5312Cc28e02b2D68Ef6",
+				"0x7f8335f0e12B07DA79aed325A04B7164C3adCa1c"
+			],
+			"PreviousContractNames": [
+				"Staking"
+			]
+		},
+		"SoftStakingV2": {
+			"ChainID": 1,
+			"Proxy": "0xa4BdE9C83FF1DFC351505304D5D5423Ba260e0A4",
+			"Beacon": null,
+			"Impl": "0x5135Eef5720c8D41571EB3E734ece248923b1AC1",
+			"InitializationArgs": [
+				"0xF1e2C6154D42d8E1768EC065B6A649163D906f7c",
+				"0xC34EE36DdA5Cb8eFFC43C46570bd92A371a01e72",
+				"0xD14400bE548aeDBC68f533969a49a238Cfe702E4",
+				"0xF507c0e7298017384eC6d20f6E8365915251ebdd",
+				"0xbd5DCFDE6e0775d722Bcb387B1b61DC16E33c006"
+			],
+			"PreviousContractNames": [
+				"SoftStaking"
+			],
+			"PreviousImplementations": [
+				"0x433c2EE9BA1C14Bc54DD519fdB1579E18362D5e4"
+			]
+		}
+	}
 }

@@ -119,6 +119,13 @@ describe("ContractCreate2", function () {
             const tokenEncodedConstructorArgs =
                 ethers.AbiCoder.defaultAbiCoder().encode(["uint8"], [6]);
 
+            const tokenInitCode = ethers.solidityPacked(
+                ["bytes", "bytes"],
+                [TokenFactory.bytecode, tokenEncodedConstructorArgs],
+            )
+
+            console.log("Token init code:", tokenInitCode);
+
             const tokenInitCodeHash = ethers.solidityPackedKeccak256(
                 ["bytes", "bytes"],
                 [TokenFactory.bytecode, tokenEncodedConstructorArgs],

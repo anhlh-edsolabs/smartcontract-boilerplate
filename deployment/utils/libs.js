@@ -109,6 +109,7 @@ async function writeDeploymentResult(
     proxyAddress = null,
     beaconAddress = null,
     previousImplAddress = null,
+    previousContractName = contractName,
     isProxyUpgrade = false,
 ) {
     DeploymentStorage.Env[ENV_KEY] =
@@ -116,6 +117,32 @@ async function writeDeploymentResult(
             ? DeploymentStorage.Env[ENV_KEY]
             : {};
     if (isProxyUpgrade) {
+        if (contractName != previousContractName) {
+            // deep cloning the object for previous contract
+            DeploymentStorage.Env[ENV_KEY][contractName] = JSON.parse(
+                JSON.stringify(
+                    DeploymentStorage.Env[ENV_KEY][previousContractName],
+                ),
+            );
+
+            // delete the object for previous contract
+            delete DeploymentStorage.Env[ENV_KEY][previousContractName];
+
+            const previousContractNames = DeploymentStorage.Env[ENV_KEY][
+                contractName
+            ]["PreviousContractNames"]
+                ? DeploymentStorage.Env[ENV_KEY][contractName][
+                      "PreviousContractNames"
+                  ]
+                : [];
+            DeploymentStorage.Env;
+            previousContractNames.push(previousContractName);
+
+            DeploymentStorage.Env[ENV_KEY][contractName][
+                "PreviousContractNames"
+            ] = previousContractNames;
+        }
+
         const previousImplAddresses = DeploymentStorage.Env[ENV_KEY][
             contractName
         ]["PreviousImplementations"]
